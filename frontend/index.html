@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cadastro</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <p class="card-title">Cadastrar usuário</p>
+
+      <div class="form-group">
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" placeholder="Ex: João Silva">
+      </div>
+
+      <div class="form-group">
+        <label for="cpf">CPF ou CNPJ</label>
+        <input type="text" id="cpf" placeholder="000.000.000-00">
+      </div>
+
+      <button class="btn-primary" onclick="cadastrar()">Cadastrar</button>
+      <div class="toast" id="toast">Usuário cadastrado com sucesso!</div>
+
+      <hr class="divider">
+      <p class="section-title">Usuários</p>
+      <ul class="user-list" id="lista">
+        <li class="empty">Nenhum usuário cadastrado ainda.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "http://127.0.0.1:8000"
+
+    function getInitials(name) {
+      return name.trim().split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || '?';
+    }
+
+    function showToast() {
+      const t = document.getElementById("toast");
+      t.style.display = "block";
+      setTimeout(() => t.style.display = "none", 2500);
+    }
+
+    async function cadastrar() {
+      const nome = document.getElementById("nome").value.trim();
+      const cpf = document.getElementById("cpf").value.trim();
+      if (!nome || !cpf) return;
+      await fetch(`${API_URL}/usuarios?nome=${encodeURIComponent(nome)}&cpf_cnpj=${encodeURIComponent(cpf)}`, {
+        method: "POST"
+      });
+      document.getElementById("nome").value = "";
+      document.getElementById("cpf").value = "";
+      showToast();
+      listar();
+    }
+
+    async function listar() {
+      const response = await fetch(`${API_URL}/usuarios`);
+      const usuarios = await response.json();
+      const lista = document.getElementById("lista");
+      lista.innerHTML = "";
+      if (!usuarios.length) {
+        lista.innerHTML = '<li class="empty">Nenhum usuário cadastrado ainda.</li>';
+        return;
+      }
+      usuarios.forEach(u => {
+        const li = document.createElement("li");
+        li.className = "user-item";
+        li.innerHTML = `
+          <div class="avatar">${getInitials(u.nome)}</div>
+          <div>
+            <div class="user-name">${u.nome}</div>
+            <div class="user-cpf">${u.cpf_cnpj}</div>
+          </div>`;
+        lista.appendChild(li);
+      });
+    }
+
+    listar();
+  </script>
+</body>
+</html>
