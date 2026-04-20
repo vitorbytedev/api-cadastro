@@ -40,7 +40,7 @@ Este projeto foi desenvolvido com foco em prática de backend utilizando Python,
 ### 1. Clonar repositório
 
 ```bash
-git clone https://github.com/seu-usuario/api-cadastro.git
+git clone https://github.com/vitorbytedev/api-cadastro.git
 ```
 
 ### 2. Entrar na pasta
